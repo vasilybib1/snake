@@ -30,3 +30,13 @@ char* readFile(char* filename){
   fclose(file);
   return string;
 }
+
+
+
+
+
+
+
+
+
+

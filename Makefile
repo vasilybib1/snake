@@ -1,19 +1,28 @@
+.SUFFIXES:
+.SUFFIXES: .c .o
+
 CC = gcc
-CFLAGS = -g -Wno-deprecated-declarations -I/opt/homebrew/include
-LDFLAGS = -L/opt/homebrew/lib
+CFLAGS = -g -Wno-deprecated-declarations 
+LLOC = -L/opt/homebrew/lib 
+ILOC = -I/opt/homebrew/include
 LDLIBS = -lglfw
-OBJECTS = util.o snake.o
 FRAMEWORK = -framework OpenGL
 
-.PHONY: all
-all: snake
+OBJDIR = obj
+
+vpath %.c src
+vpath %.h src
+
+OBJ = util.o shader.o snake.o object.o
+HEADER = util.h shader.h object.h
+objects = $(addprefix $(OBJDIR)/, $(OBJ))
+
+snake: $(objects)
+	$(CC) $(CFLAGS) -o snake $(objects) $(ILOC) $(LLOC) $(LDLIBS) $(FRAMEWORK) 
 
 .PHONY: clean
 clean:
-	$(RM) -r *~ *.o *.dSYM snake
+	$(RM) -r *~ *.o $(OBJDIR)/*.o *.dSYM snake
 
-util.o: util.h util.c
-snake.o: util.h snake.c
-
-snake: $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) $(FRAMEWORK) $(LDFLAGS) $(LDLIBS) -o snake 
+$(OBJDIR) obj/%.o: %.c $(HEADER)
+	$(CC) $(CFLAGS) -c $(ILOC) $< -o $@
