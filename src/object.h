@@ -14,5 +14,6 @@ struct object* createObject(float* ver, unsigned int verSize, unsigned int* ind,
 void bindObject(struct object* o);
 void unbindObject();
 void deleteObject(struct object* o);
+void updateVertObject(struct object* o, float* ver, unsigned int verSize);
 
 #endif

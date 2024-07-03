@@ -29,6 +29,17 @@ struct object* createObject(float* ver, unsigned int verSize, unsigned int* ind,
   return o;
 }
 
+void updateVertObject(struct object* o, float* ver, unsigned int verSize){
+  o->vertexArray = ver;
+
+  glBindVertexArray(o->VAO);
+
+  glBindBuffer(GL_ARRAY_BUFFER, o->VBO); 
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float)*verSize, o->vertexArray, GL_STATIC_DRAW);
+
+  unbindObject();
+}
+
 void bindObject(struct object* o){
   glBindVertexArray(o->VAO);
 }

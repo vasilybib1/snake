@@ -1,5 +1,7 @@
+#include <alloca.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <OpenGL/gl3.h>
 #include <GLFW/glfw3.h>
@@ -10,6 +12,15 @@
 
 const int WIDTH = 600;
 const int HEIGHT = 600;
+const int FPS = 60;
+
+// sleep wrapper function
+void sleep_us(unsigned long microseconds){
+  struct timespec ts;
+  ts.tv_sec = microseconds / 1000000ul;
+  ts.tv_nsec = (microseconds % 1000000ul) * 1000;
+  nanosleep(&ts, NULL);
+}
 
 // global variable for render modes (fill/wireframe)
 int G_fill = 1;
@@ -61,15 +72,7 @@ int main(){
   glfwGetFramebufferSize(window, &frameBufferSizeX, &frameBufferSizeY);
   glViewport(0, 0, frameBufferSizeX, frameBufferSizeY);
 
-  /*
-  float vert[] = {
-    0.5f, 0.5f, 0.0f, // top right
-    0.5f, -0.5f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, // bottom left
-    -0.5f, 0.5f, 0.0f // top left 
-  };
-  */
-
+  // data points 
   float vert[] = {
     0.1f, 0.1f, 0.0f,
     0.1f, -0.1f, 0.0f,
@@ -90,8 +93,18 @@ int main(){
 
   struct object* o = createObject(vert, 12, ind, 6);
 
+  float vert2[] = {
+    0.2f, 0.2f, 0.0f,
+    0.2f, -0.3f, 0.0f,
+    -0.3f, 0.3f, 0.0f,
+    -0.3f, -0.3f, 0.0f
+  };
+
   // main game loop
   while(!glfwWindowShouldClose(window)){
+    // start of frame 
+    clock_t start = clock();
+    
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -99,9 +112,19 @@ int main(){
     bindObject(o);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     unbindObject();
+
+    updateVertObject(o, vert2, 12);
     
     glfwSwapBuffers(window);
     glfwPollEvents();
+
+    // end of frame 
+    clock_t end = clock();
+    int msec = ((end - start) * 1000) / CLOCKS_PER_SEC;
+    // wait to keep framerate 
+    if(!(msec > (1000/FPS)))
+      sleep_us(((1000/FPS)-msec) * 1000);
+
   }
   
   deleteShader(s);
@@ -111,3 +134,5 @@ int main(){
   glfwTerminate();
   return 0;
 }
+
+
